@@ -3,6 +3,7 @@ package jozua.sijsling.snippets
 import android.app.Application
 import android.content.ComponentName
 import android.os.Bundle
+import android.os.RemoteException
 import android.util.Log
 import androidx.browser.customtabs.CustomTabsCallback
 import androidx.browser.customtabs.CustomTabsClient
@@ -30,7 +31,7 @@ class ChromeTabsConnection(private val application: Application) : CustomTabsSer
         super.onNavigationEvent(navigationEvent, extras)
         Log.i("Chrome", "Navigation event received: code=$navigationEvent")
       }
-    })
+    }) ?: throw RemoteException("Chrome browser not available.")
     taskQueue.forEach { task -> task.invoke(client, session) }
     taskQueue.clear()
     this.clientAndSession = client to session
@@ -40,7 +41,7 @@ class ChromeTabsConnection(private val application: Application) : CustomTabsSer
     this.clientAndSession = null // the library will try to reconnect
   }
 
-  fun enqueueTask(task: (client: CustomTabsClient, session: CustomTabsSession) -> Unit) {
+  fun enqueueTask(task: (client: CustomTabsClient, session: CustomTabsSession?) -> Unit) {
     val clientAndSessionCopy = clientAndSession
     if (clientAndSessionCopy != null) {
       task.invoke(clientAndSessionCopy.first, clientAndSessionCopy.second)
