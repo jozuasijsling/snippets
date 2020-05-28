@@ -9,7 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 // This class takes lessons from RxJava and applies them to coroutines. It lets multiple events
 // trigger a job, that must only run once at a time. Neither RxJava nor coroutines have a simple
 // solution for this. We use an atomic boolean to signal when it is possible to queue a new job.
-// When the job completes. Note that it's easy to introduce bugs because we are dealing with
+// When the job completes all callers get the same result and the signal flips so that a new job
+// can be queued again. Note that it's easy to introduce bugs because we are dealing with
 // multiple threads here, flipping the atomic boolean must be done at EXACTLY the right time.
 // Check the test class for more details.
 
